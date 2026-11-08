@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TabPilot Pro</title>
+<link rel="stylesheet" href="shared.css"><link rel="stylesheet" href="popup.css">
+</head>
+<body class="popup-body">
+<main class="popup">
+  <header class="brand-row">
+    <div class="logo">TP</div>
+    <div class="brand-copy"><b>TabPilot <em>PRO</em></b><small>SLEEP & NETWORK CONTROL</small></div>
+    <span id="statusDot" class="status-dot"></span>
+  </header>
+
+  <section class="sleep-hero">
+    <div class="hero-top"><span>SLEEP MODE</span><span id="modeLabel" class="mode-label">OFF</span></div>
+    <div class="hero-main"><div><strong id="liveCount">—</strong><small>LIVE TABS</small></div><div class="hero-divider"></div><div><strong id="sleepCount">—</strong><small>SLEEPING</small></div></div>
+    <div class="hero-track"><i id="trackFill"></i></div>
+    <p id="heroMessage">Turn on Sleep Mode to unload inactive pages.</p>
+    <label class="master-toggle"><span><b>Enable Sleep Mode</b><small>Unload extra tabs automatically</small></span><input id="sleepToggle" type="checkbox"><i></i></label>
+  </section>
+
+  <section class="settings-card">
+    <div class="card-heading"><div><b>Live tab limit</b><small>Maximum loaded pages across windows</small></div><output id="limitValue">5</output></div>
+    <input id="limitSlider" type="range" min="1" max="30" value="5">
+    <div class="range-caption"><span>1 tab</span><span>30 tabs</span></div>
+    <label class="small-toggle"><span><b>Sleep previous tab on switch</b><small>Put the tab you leave to sleep immediately</small></span><input id="switchSleepToggle" type="checkbox"><i></i></label>
+    <label class="small-toggle"><span><b>Block network while sleeping</b><small>Block tab-attributed background requests</small></span><input id="networkToggle" type="checkbox"><i></i></label>
+    <label class="small-toggle"><span><b>Auto-refill after closing</b><small>Wake the next eligible sleeping tab</small></span><input id="refillToggle" type="checkbox"><i></i></label>
+    <button id="applyButton" class="primary">Save & apply settings</button>
+  </section>
+
+  <div id="message" class="message" role="status">Loading…</div>
+  <button id="recoveryButton" class="dashboard-button">↶ <span>Recover recently closed tabs</span><b>↗</b></button>
+  <button id="dashboardButton" class="dashboard-button">▦ <span>Open full admin dashboard</span><b>↗</b></button>
+  <p class="footnote">Sleeping pages stay in your tab strip. No tabs are deleted.</p>
+</main>
+<script src="popup.js"></script>
+</body></html>

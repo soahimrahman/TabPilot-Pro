@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "TabPilot Pro — Smart Tab Memory & Sleep Manager",
+  "short_name": "TabPilot Pro",
+  "version": "3.2.4",
+  "description": "Intelligently sleep inactive tabs without closing them, block background network requests, and recover closed sessions.",
+  "minimum_chrome_version": "109",
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "declarativeNetRequest",
+    "sessions"
+  ],
+  "commands": {
+    "open-dashboard": {
+      "suggested_key": {
+        "default": "Alt+Shift+D",
+        "mac": "Alt+Shift+D"
+      },
+      "description": "Open TabPilot Pro Dashboard"
+    },
+    "toggle-keep-awake": {
+      "suggested_key": {
+        "default": "Alt+Shift+K",
+        "mac": "Alt+Shift+K"
+      },
+      "description": "Toggle Keep Awake on current tab"
+    },
+    "sleep-other-tabs": {
+      "suggested_key": {
+        "default": "Alt+Shift+O",
+        "mac": "Alt+Shift+O"
+      },
+      "description": "Sleep all other inactive background tabs"
+    }
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_title": "TabPilot Pro",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_page": "dashboard.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TabPilot Pro — Control Center</title>
+<link rel="stylesheet" href="shared.css"><link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">TP</div><div><b>TabPilot <em>PRO</em></b><small>SLEEP & NETWORK CONTROL</small></div></div>
+    <div class="nav-caption">WORKSPACE</div>
+    <button class="nav-link active" data-view="overview"><span>◫</span> Overview</button>
+    <button class="nav-link" data-view="tabs"><span>▤</span> Tab groups <b id="navCount">—</b></button>
+    <button class="nav-link" data-view="rules"><span>⚙</span> Sleep rules</button>
+    <button class="nav-link" data-view="activity"><span>◷</span> Activity log</button>
+    <button class="nav-link" data-view="recovery"><span>↶</span> Recovery <b id="recoveryNavCount">—</b></button>
+    <div class="sidebar-bottom"><div class="side-tip"><span>✦</span><b>Sleep, don't close.</b><p>Sleeping tabs stay in Chrome. Their page is unloaded until you open them again.</p></div><small>TABPILOT PRO · VERSION 3.2.3</small></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="crumb">TABPILOT <span>/</span> <b id="crumb">OVERVIEW</b></div><h1 id="pageTitle">Your browser, under control.</h1><p id="pageSubtitle">Control live tabs, sleeping pages and browser activity.</p></div>
+      <div class="top-actions"><span id="managerBadge" class="manager-badge"><i></i> Sleep Mode off</span><button id="refreshButton" class="refresh-button" title="Refresh">↻</button></div>
+    </header>
+
+    <section id="view-overview" class="view active">
+      <div class="hero">
+        <div class="hero-copy"><div class="kicker"><i></i> TAB SLEEP ENGINE</div><h2>Keep your workspace.<br><em>Put the rest to sleep.</em></h2><p>TabPilot unloads inactive pages and can block tab-attributed background requests while they sleep. Your tabs stay in Chrome, ready to wake when you need them.</p><button id="manageTabsButton">Manage tab groups <span>→</span></button></div>
+        <div class="hero-art"><div class="ring ring-a"></div><div class="ring ring-b"></div><div class="engine"><b>TP</b><small>SLEEP<br>ENGINE</small></div><span class="orbit-icon orbit-one">◉</span><span class="orbit-icon orbit-two">◌</span><span class="orbit-icon orbit-three">⌁</span><small class="art-caption">SMART RESOURCE CONTROL</small></div>
+      </div>
+
+      <div class="metrics">
+        <article class="metric metric-blue"><div>LIVE TABS <span>◉</span></div><strong id="liveCount">—</strong><small id="liveSub">Loaded pages</small><div class="metric-track"><i id="liveBar"></i></div></article>
+        <article class="metric"><div>SLEEPING TABS <span class="violet">◌</span></div><strong id="sleepCount">—</strong><small>Unloaded and retained</small><small class="metric-foot">Still in your tab strip</small></article>
+        <article class="metric"><div>PROTECTED <span class="green">◇</span></div><strong id="protectedCount">—</strong><small>Keep Awake, pinned or audio</small><small class="metric-foot">Excluded from auto sleep</small></article>
+        <article class="metric"><div>UNMANAGED <span class="amber">⌑</span></div><strong id="unsupportedCount">—</strong><small>Browser or unsupported pages</small><small class="metric-foot">Chrome restriction</small></article>
+      </div>
+
+      <div class="overview-grid">
+        <section class="panel config-panel">
+          <div class="panel-heading"><div><div class="eyebrow">SLEEP MODE CONTROL</div><h3>How many tabs stay live?</h3><p>Choose your global loaded-tab limit.</p></div><span class="panel-icon">⌗</span></div>
+          <div class="limit-value"><strong id="limitValue">5</strong><span>LIVE TABS</span><small>GLOBAL TARGET</small></div>
+          <input id="limitSlider" type="range" min="1" max="30" value="5">
+          <div class="range-labels"><span>1 · Minimal</span><span>30 · Flexible</span></div>
+          <div class="presets"><button data-limit="3">3</button><button data-limit="5">5</button><button data-limit="8">8</button><button data-limit="10">10</button><button data-limit="15">15</button></div>
+          <label class="switch-row"><span><b>Sleep Mode</b><small>Automatically unload extra inactive tabs.</small></span><input id="sleepEnabled" type="checkbox"><i></i></label>
+          <label class="switch-row"><span><b>Sleep previous tab on switch</b><small>Sleep the tab you leave, even before reaching the live-tab limit.</small></span><input id="switchSleepEnabled" type="checkbox"><i></i></label>
+          <label class="switch-row"><span><b>Block network while sleeping</b><small>Block tab-attributed background requests.</small></span><input id="networkEnabled" type="checkbox"><i></i></label>
+          <button id="applyButton" class="primary-button">Save & apply settings <span>→</span></button>
+          <div id="settingsMessage" class="inline-message" role="status"></div>
+        </section>
+
+        <section class="panel recent-panel">
+          <div class="panel-heading"><div><div class="eyebrow">LATEST ACTIONS</div><h3>Recent activity</h3><p>What TabPilot has done recently.</p></div><button class="link-button" data-goto="activity">View all ↗</button></div>
+          <div id="recentActivity" class="activity-list"><div class="empty-state">Loading activity…</div></div>
+        </section>
+      </div>
+
+      <div class="notice"><span>ⓘ</span><div><b>Sleep, never close</b><p>TabPilot keeps every managed tab in your tab strip. Sleeping replaces only the webpage with the local 404 sleep screen; it never closes or removes a tab. Restore a sleeping page with its Restore button.</p></div></div>
+    </section>
+
+    <section id="view-tabs" class="view">
+      <section class="panel library-panel">
+        <div class="library-head"><div><div class="eyebrow">YOUR BROWSER WORKSPACE</div><h3>Tab groups</h3><p>Group tabs by status, browser window or website. Expand and collapse each group.</p></div><div class="library-actions"><button id="wakeAllButton" class="secondary-button">↗ Wake all</button><button id="collapseButton" class="secondary-button">Collapse all</button></div></div>
+        <div class="toolbar"><label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Search tabs or websites…"></label><label class="group-select"><span>GROUP BY</span><select id="groupBy"><option value="status">Status</option><option value="window">Window</option><option value="domain">Website</option></select></label><select id="filter"><option value="all">All tabs</option><option value="live">Live</option><option value="sleeping">Sleeping</option><option value="protected">Protected</option><option value="unsupported">Unsupported</option></select></div>
+        <div id="selectionBar" class="selection-bar"><span><b id="selectedCount">0</b> selected</span><div><button data-bulk="keep">Keep Awake</button><button data-bulk="sleep">Sleep</button><button data-bulk="wake">Wake</button><button id="clearSelection">Clear</button></div></div>
+        <div id="groupsContainer" class="groups"><div class="empty-state">Loading tabs…</div></div>
+        <div class="library-footer"><span id="showingCount">—</span><span>Tab list refreshes automatically</span></div>
+      </section>
+    </section>
+
+    <section id="view-rules" class="view">
+      <div class="rules-grid">
+        <section class="panel rules-panel"><div class="eyebrow">AUTOMATION & NETWORK</div><h3>Sleep rules</h3><p class="panel-desc">Choose how tabs are suspended and what happens when a slot opens.</p>
+          <label class="rule-row"><span><b>Enable Sleep Mode</b><small>Automatically suspend inactive tabs above your limit.</small></span><input id="ruleSleep" type="checkbox"><i></i></label>
+          <label class="rule-row"><span><b>Sleep previous tab on switch</b><small>Immediately unload the tab you leave when switching tabs.</small></span><input id="ruleSwitchSleep" type="checkbox"><i></i></label>
+          <label class="rule-row"><span><b>Block network while sleeping</b><small>Block tab-attributed subresource and background requests.</small></span><input id="ruleNetwork" type="checkbox"><i></i></label>
+          <label class="rule-row"><span><b>Auto-refill after closing a tab</b><small>Wake the next eligible sleeping tab when a slot opens.</small></span><input id="ruleRefill" type="checkbox"><i></i></label>
+          <label class="rule-row"><span><b>Protect pinned tabs</b><small>Do not suspend pinned tabs automatically.</small></span><input id="rulePinned" type="checkbox"><i></i></label>
+          <label class="rule-row"><span><b>Protect tabs playing audio</b><small>Do not suspend music, calls or media tabs automatically.</small></span><input id="ruleAudio" type="checkbox"><i></i></label>
+          <div class="rule-actions"><button id="saveRulesButton" class="primary-button">Save rules</button><span id="rulesMessage"></span></div>
+        </section>
+        <section class="panel priority-panel"><div class="eyebrow">TAB PRIORITY</div><h3>How TabPilot chooses</h3><p class="panel-desc">A predictable priority order keeps your active work available.</p>
+          <div class="priority"><i>01</i><div><b>Active tabs</b><small>Chrome does not allow the active tab in a window to be discarded.</small></div><em>ALWAYS</em></div>
+          <div class="priority"><i>02</i><div><b>Keep Awake / pinned / audio</b><small>Protected tabs stay loaded unless manually slept.</small></div><em>PROTECTED</em></div>
+          <div class="priority"><i>03</i><div><b>Recently used tabs</b><small>Recent pages fill the remaining live slots.</small></div><em>RECENCY</em></div>
+          <div class="priority"><i>04</i><div><b>Older background tabs</b><small>These are unloaded first and remain in the tab strip.</small></div><em>SLEEP</em></div>
+          <div class="priority-note">The live count can exceed your target when multiple windows or protected tabs require more slots than the configured limit.</div>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-activity" class="view">
+      <section class="panel activity-panel"><div class="library-head"><div><div class="eyebrow">LOCAL HISTORY</div><h3>Activity log</h3><p>Recent sleep, wake and skipped actions.</p></div><span class="local-badge">● LOCAL ONLY</span></div><div id="fullActivity" class="activity-list"></div></section>
+    </section>
+
+    <section id="view-recovery" class="view">
+      <section class="panel recovery-panel">
+        <div class="recovery-hero">
+          <div>
+            <div class="eyebrow">EMERGENCY TAB RECOVERY</div>
+            <h3>Bring your tabs back.</h3>
+            <p>Restore recently closed tabs and windows from Chrome's session history. Recovery uses Chrome's own saved session records.</p>
+          </div>
+          <div class="recovery-icon">↶</div>
+        </div>
+        <div class="recovery-stats">
+          <article><strong id="recoveryTabCount">—</strong><small>AVAILABLE TABS</small></article>
+          <article><strong id="recoveryEntryCount">—</strong><small>RECENT ENTRIES</small></article>
+          <article><strong>60</strong><small>RESTORE TARGET</small></article>
+        </div>
+        <div class="recovery-warning"><b>Before you restore</b><span>TabPilot will pause automatic sleeping so restored tabs are not immediately unloaded again. It will not close any currently open tabs.</span></div>
+        <div class="recovery-actions">
+          <button id="restoreLast60Button" class="primary-button">↶ Restore last 60 tabs</button>
+          <button id="refreshRecoveryButton" class="secondary-button">↻ Refresh recovery list</button>
+        </div>
+        <div id="recoveryMessage" class="inline-message" role="status">Checking Chrome's recently closed sessions…</div>
+        <div class="recovery-list-heading"><div><div class="eyebrow">CHROME SESSION HISTORY</div><h4>Recently closed</h4></div><span id="recoveryLimitNote">Chrome recovery limit: 25 entries</span></div>
+        <div id="recoveryList" class="recovery-list"><div class="empty-state">Loading recovery history…</div></div>
+      </section>
+    </section>
+    <footer class="footer"><span>TabPilot Pro 3.2.3 · Settings stored locally.</span><span>Built for a lighter browsing workflow.</span></footer>
+  </main>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<script src="dashboard.js"></script>
+</body></html>

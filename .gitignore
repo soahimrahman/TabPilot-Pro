@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# OS metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Archives & Temporary files
+*.zip
+*.tar.gz
+*.crx
+*.pem
+*.log
+*.tmp
+*~
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test & coverage
+coverage/
+.nyc_output/

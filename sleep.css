@@ -1,0 +1,43 @@
+*{box-sizing:border-box}
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#090b0f;color:#e9edf2}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 36%,rgba(126,139,154,.105),transparent 48%),#090b0f;display:grid;place-items:center;padding:32px}
+.shell{width:min(100%,920px);min-height:620px;display:flex;flex-direction:column;border:1px solid #252a31;border-radius:20px;background:linear-gradient(145deg,rgba(21,25,31,.96),rgba(12,15,19,.98));box-shadow:0 28px 100px rgba(0,0,0,.45);overflow:hidden}
+.topbar{height:70px;padding:0 30px;border-bottom:1px solid #252a31;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px;color:#c4cbd3;font-size:11px;letter-spacing:2px;font-weight:750}
+.brand b{color:#737d89;font-weight:650}
+.brand-mark{width:28px;height:28px;border:1px solid #68717d;border-radius:8px;display:grid;place-items:center;color:#d7dce2;font-size:14px;letter-spacing:0}
+.status,.eyebrow{font-size:10px;letter-spacing:1.65px;font-weight:750;color:#8e98a4}
+.status{display:flex;align-items:center;gap:9px}
+.status i,.pulse,.footer-dot{width:7px;height:7px;border-radius:50%;background:#9ba4ae;display:inline-block;box-shadow:0 0 13px rgba(170,180,190,.3)}
+.hero{width:min(100% - 48px,570px);margin:auto;padding:58px 0 52px}
+.error-code{font-size:clamp(72px,12vw,112px);font-weight:850;line-height:.9;letter-spacing:-8px;color:#d0d5db}
+.error-code span{font-size:17px;letter-spacing:1px;color:#747e89;margin-left:12px;font-weight:650}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-top:31px;color:#a5adb7}
+.pulse{width:6px;height:6px}
+h1{font-size:clamp(34px,5vw,48px);letter-spacing:-2px;line-height:1.05;margin:15px 0 12px;font-weight:760}
+h1 span{color:#89939f}
+.intro{max-width:470px;color:#929ca8;font-size:14px;line-height:1.75;margin:0 0 28px}
+.site-card{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid #303740;background:rgba(255,255,255,.025);border-radius:12px}
+.site-icon{width:40px;height:40px;border-radius:10px;background:#20252b;display:grid;place-items:center;flex:none}
+.site-icon img{width:21px;height:21px;opacity:.72;filter:grayscale(1)}
+.site-details{min-width:0;display:flex;flex-direction:column;gap:4px;flex:1}
+.site-label{font-size:9px;letter-spacing:1.4px;color:#6f7985;font-weight:750}
+.site-details strong{font-size:13px;color:#d3d9df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site-details>span:last-child{font-size:11px;color:#7e8995;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.offline-tag{display:flex;align-items:center;gap:7px;font-size:9px;letter-spacing:1px;color:#929ca7;border:1px solid #3a424b;border-radius:6px;padding:7px 9px}
+.offline-tag i{width:5px;height:5px;background:#9da6af;border-radius:50%}
+button{width:100%;margin-top:18px;border:1px solid #68727e;border-radius:11px;background:linear-gradient(180deg,#d4d9df,#aeb6bf);color:#15191e;min-height:64px;padding:0 18px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:transform .16s ease,filter .16s ease}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+button:disabled{opacity:.65;cursor:wait;transform:none}
+.restore-symbol{width:30px;height:30px;border:1px solid rgba(20,25,30,.25);border-radius:8px;display:grid;place-items:center;font-size:18px}
+button>span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1}
+button b{font-size:13px;font-weight:800}
+button small{font-size:10px;color:#424b55}
+.button-arrow{font-size:20px}
+.restore-message{font-size:11px;color:#717c88;margin:13px 0 0;text-align:center;min-height:16px}
+footer{border-top:1px solid #252a31;padding:18px 26px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:9px;letter-spacing:1.1px;color:#68737f;font-weight:700}
+footer>span:first-child{display:flex;align-items:center;gap:8px}
+.footer-dot{width:5px;height:5px;background:#8e98a3}
+.version{color:#929ba5}
+@media(max-width:600px){body{padding:12px}.shell{min-height:calc(100vh - 24px);border-radius:14px}.topbar{padding:0 17px}.status{font-size:8px;letter-spacing:.8px}.hero{width:calc(100% - 36px);padding:45px 0}.error-code{letter-spacing:-5px}footer{padding:15px 17px;flex-direction:column;gap:9px}}

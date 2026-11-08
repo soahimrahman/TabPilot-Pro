@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>404 — TabPilot Sleep</title>
+  <link rel="icon" type="image/svg+xml" href="sleep-icon.svg">
+  <link rel="alternate icon" type="image/png" href="sleep-icon.png">
+  <link rel="stylesheet" href="sleep.css">
+  <script src="sleep.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">T</span><span>TABPILOT <b>MANAGER</b></span></div>
+      <span class="status"><i></i> RESOURCE CONTROL ACTIVE</span>
+    </div>
+
+    <section class="hero">
+      <div class="error-code">404<span>/SLEEP</span></div>
+      <div class="eyebrow"><span class="pulse"></span> TABPILOT TASK MANAGER IS ON</div>
+      <h1>This tab is <span>asleep.</span></h1>
+      <p class="intro">The original website has been unloaded to save your computer's memory and resources.</p>
+
+      <div class="site-card">
+        <div class="site-icon"><img src="sleep-icon.svg" alt=""></div>
+        <div class="site-details">
+          <span class="site-label">SUSPENDED WEBSITE</span>
+          <strong id="siteTitle">Sleeping tab</strong>
+          <span id="siteUrl">Original page is safely parked.</span>
+        </div>
+        <span class="offline-tag"><i></i> OFFLINE</span>
+      </div>
+
+      <button id="restoreButton" type="button">
+        <span class="restore-symbol">↗</span>
+        <span><b>Restore this tab</b><small>Reload the original website</small></span>
+        <span class="button-arrow">→</span>
+      </button>
+      <p id="restoreMessage" class="restore-message" role="status">Select this tab anytime to wake it automatically.</p>
+    </section>
+
+    <footer>
+      <span><i class="footer-dot"></i> ORIGINAL PAGE UNLOADED</span>
+      <span>NO PAGE SCRIPTS · NO MEDIA · NO TIMERS</span>
+      <span class="version">TABPILOT / 3.2</span>
+    </footer>
+  </main>
+</body>
+</html>
