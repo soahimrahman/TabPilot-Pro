@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/soahimrahman/TabPilot-Pro/releases"><img src="https://img.shields.io/badge/version-v3.2.5-705ce7?style=for-the-badge&logo=semver&logoColor=white" alt="Version 3.2.5" /></a>
+  <a href="https://github.com/soahimrahman/TabPilot-Pro/releases"><img src="https://img.shields.io/badge/version-v3.2.6-705ce7?style=for-the-badge&logo=semver&logoColor=white" alt="Version 3.2.6" /></a>
   <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Manifest-V3-5ad8a7?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Manifest V3" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" /></a>
   <a href="https://github.com/soahimrahman/TabPilot-Pro/actions"><img src="https://img.shields.io/badge/Tests-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status" /></a>
@@ -31,6 +31,7 @@
   - [4. Sleep Previous Tab on Switch](#4-sleep-previous-tab-on-switch)
   - [5. Auto-Refill on Close](#5-auto-refill-on-close)
   - [6. Emergency Tab Recovery](#6-emergency-tab-recovery)
+  - [7. Automated GitHub Update & Reload](#7-automated-github-update--reload)
 - [Feature Comparison Matrix](#-feature-comparison-matrix)
 - [Installation Guide](#-installation-guide)
 - [Settings & Configuration Reference](#-settings--configuration-reference)
@@ -171,6 +172,15 @@ Accidentally closed a window with 20 tabs? Or did your browser restart unexpecte
   1. It **pauses automatic sleep mode** and "sleep on switch" temporarily.
   2. Restores the sessions sequentially using Chrome's native session restorer.
   3. Re-enables protection so your newly restored tabs are not immediately unloaded.
+
+### 7. Automated GitHub Update & Reload
+TabPilot Pro automatically monitors its GitHub repository for new releases:
+- An internal background alarm checks GitHub's remote release manifest periodically using lightweight semver comparison.
+- When an update is detected on Git:
+  - A glowing **"NEW"** badge appears on the extension icon in Chrome's toolbar.
+  - A prominent update banner appears in both the **Popup** and **Admin Dashboard**.
+  - Clicking **"Reload"** reloads the extension directly inside Chrome using `chrome.runtime.reload()`, immediately activating updated local files without visiting `chrome://extensions`.
+  - Clicking **"Get"** directs the user directly to the latest GitHub Release ZIP.
 
 ---
 

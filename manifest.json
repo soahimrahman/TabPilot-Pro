@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabPilot Pro — Smart Tab Memory & Sleep Manager",
   "short_name": "TabPilot Pro",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "description": "Intelligently sleep inactive tabs without closing them, block background network requests, and recover closed sessions.",
   "minimum_chrome_version": "109",
   "permissions": [
@@ -11,6 +11,10 @@
     "alarms",
     "declarativeNetRequest",
     "sessions"
+  ],
+  "host_permissions": [
+    "https://raw.githubusercontent.com/soahimrahman/TabPilot-Pro/*",
+    "https://api.github.com/repos/soahimrahman/TabPilot-Pro/*"
   ],
   "commands": {
     "open-dashboard": {

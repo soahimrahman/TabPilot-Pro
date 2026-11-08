@@ -390,5 +390,36 @@ $("wakeAllButton").addEventListener("click", async () => {
 
 const requestedView = location.hash.replace(/^#/, "");
 if (copy[requestedView]) setView(requestedView);
+
+let dashboardReleaseUrl = "https://github.com/soahimrahman/TabPilot-Pro/releases";
+
+async function checkDashboardUpdate(force = false) {
+  try {
+    const res = await send("CHECK_FOR_UPDATES", { force });
+    const u = res?.update;
+    if (u?.hasUpdate) {
+      dashboardReleaseUrl = u.releasesUrl || dashboardReleaseUrl;
+      $("dashboardUpdateVersion").textContent = `v${u.latestVersion}`;
+      $("dashboardUpdateBanner").style.display = "flex";
+    } else {
+      $("dashboardUpdateBanner").style.display = "none";
+    }
+  } catch (_) {
+    $("dashboardUpdateBanner").style.display = "none";
+  }
+}
+
+$("dashboardReloadBtn").addEventListener("click", async () => {
+  $("dashboardReloadBtn").disabled = true;
+  $("dashboardReloadBtn").textContent = "Reloading…";
+  await send("RELOAD_EXTENSION");
+  setTimeout(() => location.reload(), 300);
+});
+
+$("dashboardGetBtn").addEventListener("click", () => {
+  chrome.tabs.create({ url: dashboardReleaseUrl });
+});
+
 refresh();
+checkDashboardUpdate(false);
 setInterval(refresh, 4000);

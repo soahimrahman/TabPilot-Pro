@@ -582,7 +582,7 @@ async function refillFreeSlots(settings) {
       !manualSleep.has(tab.id) &&
       !keepAwake.has(tab.id) &&
       !(settings.protectPinned && tab.pinned) &&
-      !(settings.protectAudible && tab.audible)
+      !isAudibleOrRecent(tab, settings)
     )
     .sort(newestFirst);
 
@@ -1098,6 +1098,68 @@ async function restoreRecentTabs(targetCount = 60) {
   };
 }
 
+const GITHUB_REPO = "soahimrahman/TabPilot-Pro";
+const RAW_PACKAGE_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/package.json`;
+const RELEASES_URL = `https://github.com/${GITHUB_REPO}/releases`;
+
+function compareSemver(v1, v2) {
+  const p1 = String(v1 || "0").replace(/^v/, "").split(".").map(n => parseInt(n, 10) || 0);
+  const p2 = String(v2 || "0").replace(/^v/, "").split(".").map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+    const num1 = p1[i] || 0;
+    const num2 = p2[i] || 0;
+    if (num1 > num2) return 1;
+    if (num1 < num2) return -1;
+  }
+  return 0;
+}
+
+async function checkForUpdates(force = false) {
+  try {
+    const currentVersion = chrome.runtime.getManifest?.()?.version || "3.2.5";
+    const stored = await chrome.storage.local.get({ updateCheck: null });
+    const now = Date.now();
+
+    // Check at most once every 30 minutes unless forced
+    if (!force && stored.updateCheck && (now - (stored.updateCheck.checkedAt || 0) < 1800000)) {
+      return stored.updateCheck;
+    }
+
+    const response = await fetch(RAW_PACKAGE_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const remotePkg = await response.json();
+    const remoteVersion = remotePkg.version;
+
+    const hasUpdate = compareSemver(remoteVersion, currentVersion) > 0;
+    const updateCheck = {
+      hasUpdate,
+      currentVersion,
+      latestVersion: remoteVersion,
+      releasesUrl: RELEASES_URL,
+      checkedAt: now
+    };
+
+    await chrome.storage.local.set({ updateCheck });
+
+    // Update extension action badge
+    if (hasUpdate && chrome.action?.setBadgeText) {
+      chrome.action.setBadgeText({ text: "NEW" });
+      chrome.action.setBadgeBackgroundColor({ color: "#705ce7" });
+    } else if (chrome.action?.setBadgeText) {
+      chrome.action.setBadgeText({ text: "" });
+    }
+
+    return updateCheck;
+  } catch (error) {
+    console.warn("TabPilot update check:", error);
+    const fallback = (await chrome.storage.local.get({ updateCheck: null })).updateCheck || {
+      hasUpdate: false,
+      currentVersion: chrome.runtime.getManifest?.()?.version || "3.2.5"
+    };
+    return fallback;
+  }
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
   const stored = await chrome.storage.local.get(null);
   const initial = {};
@@ -1106,13 +1168,16 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
   if (Object.keys(initial).length) await chrome.storage.local.set(initial);
   chrome.alarms.create("tabpilot-reconcile", { periodInMinutes: 1 });
+  chrome.alarms.create("tabpilot-check-update", { periodInMinutes: 360 });
   await ensureSleepDataCache();
   await seedActiveTabMap();
   scheduleReconcile("install", false, 1000);
+  setTimeout(() => checkForUpdates(false), 3000);
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   chrome.alarms.create("tabpilot-reconcile", { periodInMinutes: 1 });
+  chrome.alarms.create("tabpilot-check-update", { periodInMinutes: 360 });
   await ensureSleepDataCache();
   await seedActiveTabMap();
   const currentTabs = await chrome.tabs.query({});
@@ -1121,10 +1186,12 @@ chrome.runtime.onStartup.addListener(async () => {
     if (isSleeping(tab) && isManageable(tab)) await syncNetworkBlock(tab, settings);
   }
   scheduleReconcile("startup", false, 1200);
+  setTimeout(() => checkForUpdates(false), 4000);
 });
 
 chrome.alarms.onAlarm.addListener(alarm => {
   if (alarm.name === "tabpilot-reconcile") scheduleReconcile("periodic-check", false, 100);
+  if (alarm.name === "tabpilot-check-update") checkForUpdates(false);
 });
 
 chrome.tabs.onCreated.addListener(() => scheduleReconcile("tab-created", false, 400));
@@ -1192,6 +1259,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.windows.onFocusChanged.addListener(() => scheduleReconcile("window-focus", false, 500));
+
+chrome.windows.onRemoved.addListener((windowId) => {
+  chrome.storage.session.get({ activeTabByWindow: {} }).then(stored => {
+    const activeTabByWindow = { ...(stored.activeTabByWindow || {}) };
+    delete activeTabByWindow[String(windowId)];
+    return chrome.storage.session.set({ activeTabByWindow });
+  }).catch(() => {});
+  scheduleReconcile("window-removed", false, 500);
+});
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "local") return;
@@ -1311,6 +1387,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "WAKE_ALL":
         return { ok: true, woken: await wakeAllSleeping(), state: await getState() };
+
+      case "CHECK_FOR_UPDATES":
+        return { ok: true, update: await checkForUpdates(!!message?.force) };
+
+      case "RELOAD_EXTENSION":
+        if (chrome.runtime.requestUpdateCheck) {
+          try {
+            chrome.runtime.requestUpdateCheck((status) => {
+              if (status === "update_available") {
+                chrome.runtime.reload();
+              }
+            });
+          } catch (_) {}
+        }
+        setTimeout(() => {
+          try { chrome.runtime.reload(); } catch (_) {}
+        }, 120);
+        return { ok: true };
 
       default:
         return { ok: false, error: "Unknown request." };

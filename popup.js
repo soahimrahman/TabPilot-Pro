@@ -49,6 +49,44 @@ $("applyButton").addEventListener("click", async () => {
     $("applyButton").textContent = "Save & apply settings";
   }
 });
+let latestReleaseUrl = "https://github.com/soahimrahman/TabPilot-Pro/releases";
+
+async function checkUpdate(force = false) {
+  try {
+    const res = await send("CHECK_FOR_UPDATES", { force });
+    const u = res?.update;
+    if (u?.hasUpdate) {
+      latestReleaseUrl = u.releasesUrl || latestReleaseUrl;
+      $("updateVersion").textContent = u.latestVersion;
+      $("updateBanner").style.display = "flex";
+    } else {
+      $("updateBanner").style.display = "none";
+      if (force) $("message").textContent = `TabPilot Pro is up to date (v${u?.currentVersion || "3.2.5"}).`;
+    }
+  } catch (_) {
+    $("updateBanner").style.display = "none";
+  }
+}
+
+$("updateReloadBtn").addEventListener("click", async () => {
+  $("updateReloadBtn").disabled = true;
+  $("updateReloadBtn").textContent = "Reloading…";
+  await send("RELOAD_EXTENSION");
+  setTimeout(() => window.close(), 200);
+});
+
+$("updateGetBtn").addEventListener("click", () => {
+  chrome.tabs.create({ url: latestReleaseUrl });
+  window.close();
+});
+
+$("checkUpdateBtn").addEventListener("click", async () => {
+  $("checkUpdateBtn").textContent = "Checking…";
+  await checkUpdate(true);
+  $("checkUpdateBtn").textContent = "↻ Check for updates";
+});
+
 $("dashboardButton").addEventListener("click", () => chrome.runtime.openOptionsPage());
 $("recoveryButton").addEventListener("click", () => chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html#recovery") }));
 refresh();
+checkUpdate(false);

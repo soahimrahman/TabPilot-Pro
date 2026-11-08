@@ -13,6 +13,17 @@
     <span id="statusDot" class="status-dot"></span>
   </header>
 
+  <div id="updateBanner" class="update-banner" style="display:none;">
+    <div class="update-info">
+      <span>🚀 <b>Update Available</b></span>
+      <small>v<span id="updateVersion"></span> is ready</small>
+    </div>
+    <div class="update-actions">
+      <button id="updateReloadBtn" class="update-btn" title="Reload extension to apply new files">Reload</button>
+      <button id="updateGetBtn" class="update-btn-outline" title="Open GitHub release">Get</button>
+    </div>
+  </div>
+
   <section class="sleep-hero">
     <div class="hero-top"><span>SLEEP MODE</span><span id="modeLabel" class="mode-label">OFF</span></div>
     <div class="hero-main"><div><strong id="liveCount">—</strong><small>LIVE TABS</small></div><div class="hero-divider"></div><div><strong id="sleepCount">—</strong><small>SLEEPING</small></div></div>
@@ -34,6 +45,7 @@
   <div id="message" class="message" role="status">Loading…</div>
   <button id="recoveryButton" class="dashboard-button">↶ <span>Recover recently closed tabs</span><b>↗</b></button>
   <button id="dashboardButton" class="dashboard-button">▦ <span>Open full admin dashboard</span><b>↗</b></button>
+  <button id="checkUpdateBtn" class="check-update-link">↻ Check for updates</button>
   <p class="footnote">Sleeping pages stay in your tab strip. No tabs are deleted.</p>
 </main>
 <script src="popup.js"></script>

@@ -21,7 +21,15 @@
   <main class="main">
     <header class="topbar">
       <div><div class="crumb">TABPILOT <span>/</span> <b id="crumb">OVERVIEW</b></div><h1 id="pageTitle">Your browser, under control.</h1><p id="pageSubtitle">Control live tabs, sleeping pages and browser activity.</p></div>
-      <div class="top-actions"><span id="managerBadge" class="manager-badge"><i></i> Sleep Mode off</span><button id="refreshButton" class="refresh-button" title="Refresh">↻</button></div>
+      <div class="top-actions">
+        <div id="dashboardUpdateBanner" class="dashboard-update-pill" style="display:none;">
+          <span>🚀 Update available: <b id="dashboardUpdateVersion"></b></span>
+          <button id="dashboardReloadBtn" class="pill-btn" title="Reload extension in Chrome">Reload</button>
+          <button id="dashboardGetBtn" class="pill-btn-outline" title="Open GitHub release">Get</button>
+        </div>
+        <span id="managerBadge" class="manager-badge"><i></i> Sleep Mode off</span>
+        <button id="refreshButton" class="refresh-button" title="Refresh">↻</button>
+      </div>
     </header>
 
     <section id="view-overview" class="view active">

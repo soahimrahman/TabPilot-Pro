@@ -113,3 +113,25 @@ test('cache retention keeps live keys and recently restored keys for back-button
   assert.equal(next['key-restored-old'], undefined, 'Old restored keys (>30m) should be pruned');
   assert.equal(next['key-dead'], undefined, 'Dead unreferenced keys should be pruned');
 });
+
+test('compareSemver accurately compares release versions', () => {
+  function compareSemver(v1, v2) {
+    const p1 = String(v1 || '0').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    const p2 = String(v2 || '0').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+      const num1 = p1[i] || 0;
+      const num2 = p2[i] || 0;
+      if (num1 > num2) return 1;
+      if (num1 < num2) return -1;
+    }
+    return 0;
+  }
+
+  assert.equal(compareSemver('3.2.6', '3.2.5'), 1, 'Newer patch version should detect update');
+  assert.equal(compareSemver('3.3.0', '3.2.5'), 1, 'Newer minor version should detect update');
+  assert.equal(compareSemver('4.0.0', '3.2.5'), 1, 'Newer major version should detect update');
+  assert.equal(compareSemver('v3.2.6', '3.2.5'), 1, 'Prefixed v should parse correctly');
+  assert.equal(compareSemver('3.2.5', '3.2.5'), 0, 'Equal versions should return 0');
+  assert.equal(compareSemver('3.2.4', '3.2.5'), -1, 'Older version should return -1');
+  assert.equal(compareSemver('3.2', '3.2.0'), 0, 'Shorter versions should match zero-padded');
+});

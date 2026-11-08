@@ -45,3 +45,12 @@ body.popup-body { width:370px;min-height:520px;background:radial-gradient(ellips
 .dashboard-button span { color:#e5edfc;font-size:9px;font-weight:850; }
 .dashboard-button b { margin-left:auto;color:#91acd3;font-size:12px; }
 .footnote { margin:11px 0 0;text-align:center;color:var(--muted2);font-size:7px; }
+.update-banner { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;margin-bottom:12px;border:1px solid #705ce7;border-radius:12px;background:linear-gradient(135deg,rgba(112,92,231,.25),rgba(77,145,250,.2));box-shadow:0 4px 16px rgba(112,92,231,.2); }
+.update-info { display:flex;flex-direction:column;gap:2px; }
+.update-info span { font-size:9px;color:#fff;font-weight:750; }
+.update-info small { font-size:7px;color:#b8c7ff; }
+.update-actions { display:flex;gap:6px; }
+.update-btn { padding:4px 8px;border-radius:6px;background:#705ce7;border:1px solid #8e7bf5;color:#fff;font-size:8px;font-weight:800;cursor:pointer; }
+.update-btn-outline { padding:4px 8px;border-radius:6px;background:transparent;border:1px solid #705ce7;color:#c4d4ff;font-size:8px;font-weight:800;cursor:pointer; }
+.check-update-link { width:100%;background:transparent;border:0;color:#6b85ab;font-size:7px;cursor:pointer;margin-top:7px;text-align:center;padding:4px; }
+.check-update-link:hover { color:#a3bde5; }
