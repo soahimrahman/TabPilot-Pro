@@ -73,3 +73,4 @@ test('dashboard and popup html link valid scripts and stylesheets', () => {
   assert.match(popupHtml, /popup\.js/, 'popup.html should link popup.js');
   assert.match(dashboardHtml, /dashboard\.js/, 'dashboard.html should link dashboard.js');
 });
+
