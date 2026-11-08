@@ -68,3 +68,9 @@ input[type=range] { width:100%;accent-color:#83acff; }.config-panel input[type=r
 .recovery-item-copy small{display:block;margin-top:4px;color:#7f93b2;font-size:7px}
 .recovery-item-count{white-space:nowrap;color:#a9bbd6;font-size:7px;font-weight:800}
 @media(max-width:760px){.recovery-panel{padding:14px}.recovery-stats{grid-template-columns:1fr 1fr}.recovery-hero{align-items:flex-start}.recovery-list-heading{align-items:flex-start;flex-direction:column}}
+.sidebar-author-card{margin-top:12px;padding:10px 12px;border:1px solid #283e5e;border-radius:10px;background:linear-gradient(145deg,#0d192c,#0a1424);display:flex;flex-direction:column;gap:4px}
+.author-label{font-size:7px;color:#7890b1;font-weight:700;letter-spacing:.5px}
+.author-link{color:#9fc0ff;text-decoration:none;font-size:8.5px;font-weight:800}
+.author-link:hover{color:#bad4ff;text-decoration:underline}
+.sidebar-donate-btn{display:inline-block;margin-top:4px;padding:5px 8px;border:1px solid #72552c;border-radius:6px;background:#2b2213;color:#f2c577;text-decoration:none;font-size:7.5px;font-weight:800;text-align:center}
+.sidebar-donate-btn:hover{background:#3a2f1b;color:#ffe299;border-color:#8f6d3a}

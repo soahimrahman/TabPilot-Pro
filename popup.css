@@ -54,3 +54,8 @@ body.popup-body { width:370px;min-height:520px;background:radial-gradient(ellips
 .update-btn-outline { padding:4px 8px;border-radius:6px;background:transparent;border:1px solid #705ce7;color:#c4d4ff;font-size:8px;font-weight:800;cursor:pointer; }
 .check-update-link { width:100%;background:transparent;border:0;color:#6b85ab;font-size:7px;cursor:pointer;margin-top:7px;text-align:center;padding:4px; }
 .check-update-link:hover { color:#a3bde5; }
+.popup-credits { display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:7px;color:var(--muted2); }
+.popup-credits a { color:#8eafe4;text-decoration:none;font-weight:750; }
+.popup-credits a:hover { text-decoration:underline;color:#bad4ff; }
+.popup-credits .donate-link { color:#f0c578;padding:2px 6px;border-radius:4px;border:1px solid #5a4722;background:#241d13; }
+.popup-credits .donate-link:hover { background:#332918;color:#ffe299;text-decoration:none; }

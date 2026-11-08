@@ -14,6 +14,8 @@
   <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Manifest-V3-5ad8a7?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Manifest V3" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" /></a>
   <a href="https://github.com/soahimrahman/TabPilot-Pro/actions"><img src="https://img.shields.io/badge/Tests-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status" /></a>
+  <a href="https://www.supportkori.com/soahimrahmantasin17"><img src="https://img.shields.io/badge/Donate-SupportKori-f2c475?style=for-the-badge&logo=coffeescript&logoColor=black" alt="Support Kori" /></a>
+  <a href="https://www.facebook.com/soahim.rahman.tasin17/"><img src="https://img.shields.io/badge/Author-Soahim%20Rahman%20Tasin-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="Author Facebook" /></a>
   <a href="#-security-privacy--least-privilege"><img src="https://img.shields.io/badge/Privacy-100%25%20Localhost-4d91fa?style=for-the-badge&logo=shield" alt="Localhost Only" /></a>
 </p>
 
@@ -378,6 +380,15 @@ TabPilot-Pro/
 
 ---
 
+## 👨‍💻 Creator & Support
+
+TabPilot Pro is designed and engineered by **Soahim Rahman Tasin**.
+
+- 🌐 **Facebook Profile:** [soahim.rahman.tasin17](https://www.facebook.com/soahim.rahman.tasin17/)
+- ☕ **Support & Donation:** If TabPilot Pro makes your daily browser lighter and faster, support future open-source development at [Support Kori](https://www.supportkori.com/soahimrahmantasin17).
+
+---
+
 ## 📄 License
 
 This project is open-source software licensed under the [MIT License](LICENSE).
@@ -385,5 +396,5 @@ This project is open-source software licensed under the [MIT License](LICENSE).
 ---
 
 <p align="center">
-  Crafted with care by <a href="https://github.com/soahimrahman">Soahim Rahman</a>.
+  Crafted with care by <a href="https://www.facebook.com/soahim.rahman.tasin17/">Soahim Rahman Tasin</a>.
 </p>

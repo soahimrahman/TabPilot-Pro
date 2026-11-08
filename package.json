@@ -22,7 +22,14 @@
     "session-recovery",
     "browser-extension"
   ],
-  "author": "Soahim Rahman",
+  "author": {
+    "name": "Soahim Rahman Tasin",
+    "url": "https://www.facebook.com/soahim.rahman.tasin17/"
+  },
+  "funding": {
+    "type": "supportkori",
+    "url": "https://www.supportkori.com/soahimrahmantasin17"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/soahimrahman/TabPilot-Pro/issues"
