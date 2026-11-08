@@ -3,7 +3,7 @@
   "version": "3.2.4",
   "description": "TabPilot Pro — Smart Tab Memory & Sleep Manager for Chrome, Edge & Brave. Sleep inactive tabs without closing them, block background network requests, and recover closed sessions.",
   "scripts": {
-    "test": "node --test tests/*.test.js",
+    "test": "node --test tests/extension.test.js tests/logic.test.js",
     "check": "node -c service-worker.js && node -c dashboard.js && node -c popup.js && node -c sleep.js"
   },
   "repository": {
