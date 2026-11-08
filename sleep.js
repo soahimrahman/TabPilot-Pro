@@ -10,6 +10,9 @@ const urlNode = document.getElementById("siteUrl");
       titleNode.textContent = result.info.title || "Sleeping tab";
       urlNode.textContent = result.info.domain || "Original page is safely parked.";
       document.title = `Sleeping · ${result.info.title || "tab"}`.slice(0, 120);
+      if (result.info.restored) {
+        restoreMessage.textContent = "This tab was restored earlier. Press Enter or click Restore to reload it.";
+      }
     } else {
       titleNode.textContent = "Sleeping tab";
       urlNode.textContent = "Original page details are unavailable.";
@@ -19,7 +22,8 @@ const urlNode = document.getElementById("siteUrl");
   }
 })();
 
-restoreButton.addEventListener("click", async () => {
+async function performRestore() {
+  if (restoreButton.disabled) return;
   restoreButton.disabled = true;
   restoreMessage.textContent = "Restoring the original website…";
   try {
@@ -27,6 +31,15 @@ restoreButton.addEventListener("click", async () => {
     if (result?.ok === false) throw new Error(result.error || "Could not restore this tab.");
   } catch (error) {
     restoreButton.disabled = false;
-    restoreMessage.textContent = error?.message || "Could not restore this tab. Select it again to retry.";
+    restoreMessage.textContent = error?.message || "Could not restore this tab. Click above or press Enter to retry.";
+  }
+}
+
+restoreButton.addEventListener("click", performRestore);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    performRestore();
   }
 });

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/soahimrahman/TabPilot-Pro/releases"><img src="https://img.shields.io/badge/version-v3.2.4-705ce7?style=for-the-badge&logo=semver&logoColor=white" alt="Version 3.2.4" /></a>
+  <a href="https://github.com/soahimrahman/TabPilot-Pro/releases"><img src="https://img.shields.io/badge/version-v3.2.5-705ce7?style=for-the-badge&logo=semver&logoColor=white" alt="Version 3.2.5" /></a>
   <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Manifest-V3-5ad8a7?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Manifest V3" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" /></a>
   <a href="https://github.com/soahimrahman/TabPilot-Pro/actions"><img src="https://img.shields.io/badge/Tests-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status" /></a>
@@ -153,9 +153,10 @@ The reconciliation loop runs automatically during:
 
 ### 4. Sleep Previous Tab on Switch
 For users seeking maximum memory savings (especially on laptops or machines with 8 GB RAM):
-- Enabling **"Sleep previous tab on switch"** instructs TabPilot to immediately unload the tab you navigate away from.
-- A **300ms debounce protection window** is enforced: if you rapidly flip back and forth between two tabs, TabPilot avoids discarding the tab prematurely.
-- Protected tabs (pinned, audio, Keep Awake) are respected and will never be put to sleep on switch.
+- Enabling **"Sleep previous tab on switch"** instructs TabPilot to unload the tab you navigate away from.
+- An **anti-thrashing grace period (4 seconds)** is enforced: if you rapidly flip back and forth between two tabs to compare values or copy text, TabPilot cancels the sleep action and keeps both live.
+- Protected tabs (pinned, active/recent audio, Keep Awake) are respected and will never be put to sleep on switch.
+- **Meeting & Audio Protection:** Features a 90-second cooldown window so brief conversational pauses in Google Meet, Zoom, or Spotify track transitions won't prematurely drop calls or music.
 
 ### 5. Auto-Refill on Close
 When you close an active tab, a "live tab slot" opens up in your workspace:
@@ -287,6 +288,8 @@ TabPilot Pro is engineered strictly under **Zero-Trust & Zero-Telemetry Principl
 - **No Remote Servers or APIs:** The extension does not connect to any external server, cloud backend, or remote endpoint. Everything executes locally.
 - **No Third-Party Analytics:** Zero tracking scripts, cookies, analytics beacons, or user fingerprinting.
 - **Cryptographic Token Isolation:** When a tab is put to sleep, the original URL and title are stored in your browser's private local storage under an ephemeral UUID key. The URL displayed on the sleep screen (`sleep.html?key=...`) never exposes your destination URL to screen recording or shoulder surfing.
+- **Incognito & Private Browsing Isolation:** Private/Incognito tabs never persist URLs, titles, or activity records to disk (`chrome.storage.local`). All incognito sleep data is stored exclusively in RAM (`chrome.storage.session`) and automatically destroyed when the window closes, preventing history leakage to the non-incognito dashboard.
+- **Back-Button & History Resilience:** Sleep records maintain a 30-minute rolling cache so pressing Chrome's "Back" arrow never hits a dead or broken 404 page.
 - **Granular Chrome Permissions:**
 
 | Permission | Technical Requirement |

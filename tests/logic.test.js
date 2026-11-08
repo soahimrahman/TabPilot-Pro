@@ -57,3 +57,59 @@ test('sleepPageKeyFromUrl correctly parses key parameter from extension sleep UR
 
   assert.equal(sleepPageKeyFromUrl('not-a-url', origin), null);
 });
+
+test('isAudibleOrRecent protects tabs currently audible and tabs in the 90s grace period', () => {
+  const recentAudibleTabs = new Map();
+  const AUDIBLE_COOLDOWN_MS = 90000;
+
+  function isAudibleOrRecent(tab, protectAudible, now = Date.now()) {
+    if (!protectAudible) return false;
+    if (tab.audible) {
+      recentAudibleTabs.set(tab.id, now);
+      return true;
+    }
+    const lastAudible = recentAudibleTabs.get(tab.id);
+    if (lastAudible && (now - lastAudible) < AUDIBLE_COOLDOWN_MS) {
+      return true;
+    }
+    return false;
+  }
+
+  const tabId = 101;
+  const now = 1000000;
+
+  // Active audio
+  assert.equal(isAudibleOrRecent({ id: tabId, audible: true }, true, now), true);
+
+  // Audio paused 30s ago (within 90s cooldown) - meeting silence or song pause
+  assert.equal(isAudibleOrRecent({ id: tabId, audible: false }, true, now + 30000), true);
+
+  // Audio paused 100s ago (beyond 90s cooldown)
+  assert.equal(isAudibleOrRecent({ id: tabId, audible: false }, true, now + 100000), false);
+
+  // Feature turned off
+  assert.equal(isAudibleOrRecent({ id: tabId, audible: true }, false, now), false);
+});
+
+test('cache retention keeps live keys and recently restored keys for back-button resilience', () => {
+  const now = Date.now();
+  const liveKeys = new Set(['key-live-1']);
+  const cache = {
+    'key-live-1': { url: 'https://example.com/1', title: 'Live Tab' },
+    'key-restored-recent': { url: 'https://example.com/2', title: 'Recent Restored', restoredAt: now - 300000 }, // 5 mins ago
+    'key-restored-old': { url: 'https://example.com/3', title: 'Old Restored', restoredAt: now - 2000000 }, // > 30 mins ago
+    'key-dead': { url: 'https://example.com/4', title: 'Dead Tab' }
+  };
+
+  const next = {};
+  for (const [key, value] of Object.entries(cache)) {
+    const isLive = liveKeys.has(key);
+    const isRecentRestore = value.restoredAt && (now - value.restoredAt < 1800000);
+    if (isLive || isRecentRestore) next[key] = value;
+  }
+
+  assert.ok(next['key-live-1'], 'Currently sleeping live keys should be retained');
+  assert.ok(next['key-restored-recent'], 'Recently restored keys should be retained for back-button resilience');
+  assert.equal(next['key-restored-old'], undefined, 'Old restored keys (>30m) should be pruned');
+  assert.equal(next['key-dead'], undefined, 'Dead unreferenced keys should be pruned');
+});

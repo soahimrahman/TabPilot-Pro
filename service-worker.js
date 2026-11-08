@@ -30,6 +30,9 @@ let activationQueue = Promise.resolve();
 const wakingTabs = new Set();
 let sleepDataCache = {};
 let sleepDataCachePromise = null;
+let incognitoSleepData = {};
+const recentAudibleTabs = new Map();
+const AUDIBLE_COOLDOWN_MS = 90000; // 90-second protection window for calls, meetings & media pauses
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -51,6 +54,18 @@ async function ensureSleepDataCache() {
   return sleepDataCachePromise;
 }
 
+async function ensureIncognitoCache() {
+  try {
+    const res = await chrome.storage.session.get({ incognitoSleepingTabs: {} });
+    incognitoSleepData = res.incognitoSleepingTabs && typeof res.incognitoSleepingTabs === "object"
+      ? res.incognitoSleepingTabs
+      : {};
+  } catch (_) {
+    if (!incognitoSleepData) incognitoSleepData = {};
+  }
+  return incognitoSleepData;
+}
+
 function sleepPageKeyFromUrl(value) {
   try {
     const current = new URL(value);
@@ -70,16 +85,38 @@ function sleepPageKeyFromUrl(value) {
 
 async function pruneSleepDataCache(tabs) {
   await ensureSleepDataCache();
+  await ensureIncognitoCache();
   const liveKeys = new Set(tabs.map(tab => sleepPageKeyFromUrl(rawTabUrl(tab))).filter(Boolean));
+  const now = Date.now();
+
   const next = {};
   let changed = false;
   for (const [key, value] of Object.entries(sleepDataCache)) {
-    if (liveKeys.has(key)) next[key] = value;
+    // Keep currently live sleeping tabs, or recently restored tabs (within 30 mins) for back-button resilience
+    const isLive = liveKeys.has(key);
+    const isRecentRestore = value.restoredAt && (now - value.restoredAt < 1800000);
+    if (isLive || isRecentRestore) next[key] = value;
     else changed = true;
   }
   if (changed) {
     sleepDataCache = next;
     await chrome.storage.local.set({ sleepingTabs: sleepDataCache });
+  }
+
+  // Also prune incognito session cache
+  const nextIncognito = {};
+  let incognitoChanged = false;
+  for (const [key, value] of Object.entries(incognitoSleepData)) {
+    const isLive = liveKeys.has(key);
+    const isRecentRestore = value.restoredAt && (now - value.restoredAt < 1800000);
+    if (isLive || isRecentRestore) nextIncognito[key] = value;
+    else incognitoChanged = true;
+  }
+  if (incognitoChanged) {
+    incognitoSleepData = nextIncognito;
+    try {
+      await chrome.storage.session.set({ incognitoSleepingTabs: incognitoSleepData });
+    } catch (_) {}
   }
 }
 
@@ -94,7 +131,11 @@ function rawTabUrl(tab) {
 
 function sleepPageData(tab) {
   const key = sleepPageKeyFromUrl(rawTabUrl(tab));
-  return key ? sleepDataCache[key] || null : null;
+  if (!key) return null;
+  if (tab?.incognito && incognitoSleepData[key]) {
+    return incognitoSleepData[key];
+  }
+  return sleepDataCache[key] || incognitoSleepData[key] || null;
 }
 
 function isSleepPage(tab) {
@@ -122,17 +163,32 @@ function isManageable(tab) {
 }
 
 async function makeSleepPageUrl(tab) {
-  await ensureSleepDataCache();
   const token = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
-  sleepDataCache = {
-    ...sleepDataCache,
-    [token]: {
-      url: tabUrl(tab),
-      title: tabTitle(tab).slice(0, 500),
-      createdAt: Date.now()
-    }
+  const entry = {
+    url: tabUrl(tab),
+    title: tabTitle(tab).slice(0, 500),
+    createdAt: Date.now(),
+    incognito: !!tab.incognito
   };
-  await chrome.storage.local.set({ sleepingTabs: sleepDataCache });
+
+  // Preserve incognito privacy: do not write incognito tab details to persistent storage
+  if (tab.incognito) {
+    await ensureIncognitoCache();
+    incognitoSleepData = {
+      ...incognitoSleepData,
+      [token]: entry
+    };
+    try {
+      await chrome.storage.session.set({ incognitoSleepingTabs: incognitoSleepData });
+    } catch (_) {}
+  } else {
+    await ensureSleepDataCache();
+    sleepDataCache = {
+      ...sleepDataCache,
+      [token]: entry
+    };
+    await chrome.storage.local.set({ sleepingTabs: sleepDataCache });
+  }
 
   const page = new URL(chrome.runtime.getURL("sleep.html"));
   page.searchParams.set("key", token);
@@ -224,6 +280,9 @@ async function clearAllSleepNetworkRules() {
 
 async function addActivity(type, tab, detail = "") {
   try {
+    // Preserve Incognito Privacy: never write private browsing activity to disk
+    if (tab?.incognito) return;
+
     const stored = await chrome.storage.local.get({ activityLog: [] });
     const rows = Array.isArray(stored.activityLog) ? stored.activityLog : [];
     rows.unshift({
@@ -253,11 +312,25 @@ async function cleanPreferences(tabs, settings) {
   return { ...settings, keepAwakeIds, manualSleepIds };
 }
 
+function isAudibleOrRecent(tab, settings) {
+  if (!settings.protectAudible) return false;
+  if (tab.audible) {
+    recentAudibleTabs.set(tab.id, Date.now());
+    return true;
+  }
+  const lastAudible = recentAudibleTabs.get(tab.id);
+  // Protect media/calls for 90 seconds after audio pauses (silence in meeting, song transition)
+  if (lastAudible && (Date.now() - lastAudible) < AUDIBLE_COOLDOWN_MS) {
+    return true;
+  }
+  return false;
+}
+
 function isProtected(tab, settings, keepAwake, manualSleep) {
   if (manualSleep.has(tab.id)) return false;
   if (keepAwake.has(tab.id)) return true;
   if (settings.protectPinned && tab.pinned) return true;
-  if (settings.protectAudible && tab.audible) return true;
+  if (isAudibleOrRecent(tab, settings)) return true;
   if (tab.status === "loading") return true;
   return false;
 }
@@ -337,12 +410,11 @@ async function sleepPreviousTab(previousTabId, newActiveTabId) {
     manualSleep.has(previousTabId) ||
     keepAwake.has(previousTabId) ||
     (settings.protectPinned && previous.pinned) ||
-    (settings.protectAudible && previous.audible)
+    isAudibleOrRecent(previous, settings)
   ) return;
 
-  // Give Chrome time to finish the activation transition. Re-check the tab
-  // immediately before discarding so a rapid switch-back is never discarded.
-  await delay(300);
+  // 4-second grace period: prevents rapid switch-back thrashing when comparing tabs or copying text
+  await delay(4000);
   previous = await getTab(previousTabId);
   if (
     !previous ||
@@ -420,11 +492,22 @@ async function wakeTabInBackground(tabId) {
       const finalTab = await getTab(tabId);
       if (restored && finalTab && !isSleepPage(finalTab)) {
         const key = sleepPageKeyFromUrl(rawTabUrl(target));
-        if (key && sleepDataCache[key]) {
-          const nextCache = { ...sleepDataCache };
-          delete nextCache[key];
-          sleepDataCache = nextCache;
-          await chrome.storage.local.set({ sleepingTabs: sleepDataCache });
+        if (key) {
+          if (target.incognito && incognitoSleepData[key]) {
+            incognitoSleepData = {
+              ...incognitoSleepData,
+              [key]: { ...incognitoSleepData[key], restoredAt: Date.now() }
+            };
+            try {
+              await chrome.storage.session.set({ incognitoSleepingTabs: incognitoSleepData });
+            } catch (_) {}
+          } else if (sleepDataCache[key]) {
+            sleepDataCache = {
+              ...sleepDataCache,
+              [key]: { ...sleepDataCache[key], restoredAt: Date.now() }
+            };
+            await chrome.storage.local.set({ sleepingTabs: sleepDataCache });
+          }
         }
         await addActivity("wake", { ...finalTab, title: tabTitle(finalTab), url: tabUrl(finalTab) });
         return true;
@@ -664,6 +747,20 @@ async function wakeTab(tabId) {
   scheduleReconcile("manual-wake", false, 500);
 }
 
+// Restores a sleeping tab without forcing it into the permanent keepAwake whitelist.
+async function restoreSleepTab(tabId) {
+  const settings = await getSettings();
+  if (settings.manualSleepIds.includes(tabId)) {
+    await chrome.storage.local.set({
+      manualSleepIds: settings.manualSleepIds.filter(id => id !== tabId)
+    });
+  }
+
+  const success = await wakeTabInBackground(tabId);
+  if (!success) throw new Error("TabPilot could not restore this tab. Try selecting it in the tab bar.");
+  scheduleReconcile("sleep-screen-restore", false, 500);
+}
+
 async function closeTab(tabId) {
   // Safety behavior: TabPilot never closes tabs. Legacy CLOSE_TAB requests
   // are converted into sleep requests so the tab remains in the tab strip.
@@ -701,10 +798,11 @@ async function bulkAction(tabIds, action) {
       const tab = await getTab(id);
       if (!tab || !isSleeping(tab)) continue;
       const current = await getSettings();
-      await chrome.storage.local.set({
-        manualSleepIds: current.manualSleepIds.filter(value => value !== id),
-        keepAwakeIds: [...new Set([...current.keepAwakeIds, id])]
-      });
+      if (current.manualSleepIds.includes(id)) {
+        await chrome.storage.local.set({
+          manualSleepIds: current.manualSleepIds.filter(value => value !== id)
+        });
+      }
       await wakeTabInBackground(id);
     }
   } else if (action === "unprotect") {
@@ -822,18 +920,19 @@ async function getState() {
 
 async function wakeAllSleeping() {
   await ensureSleepDataCache();
+  await ensureIncognitoCache();
   const tabs = await chrome.tabs.query({});
-  const settings = await getSettings();
   const candidates = tabs
     .filter(tab => isManageable(tab) && isSleeping(tab))
     .sort(newestFirst);
   let woken = 0;
   for (const tab of candidates) {
     const current = await getSettings();
-    await chrome.storage.local.set({
-      keepAwakeIds: [...new Set([...current.keepAwakeIds, tab.id])],
-      manualSleepIds: current.manualSleepIds.filter(id => id !== tab.id)
-    });
+    if (current.manualSleepIds.includes(tab.id)) {
+      await chrome.storage.local.set({
+        manualSleepIds: current.manualSleepIds.filter(id => id !== tab.id)
+      });
+    }
     if (await wakeTabInBackground(tab.id)) woken += 1;
   }
   return woken;
@@ -1031,6 +1130,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
 chrome.tabs.onCreated.addListener(() => scheduleReconcile("tab-created", false, 400));
 
 chrome.tabs.onRemoved.addListener((tabId) => {
+  recentAudibleTabs.delete(tabId);
   setNetworkBlock(tabId, false);
   chrome.storage.session.get({ activeTabByWindow: {} }).then(stored => {
     const activeTabByWindow = { ...(stored.activeTabByWindow || {}) };
@@ -1069,6 +1169,10 @@ chrome.tabs.onActivated.addListener(info => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.audible === true) {
+    recentAudibleTabs.set(tabId, Date.now());
+  }
+
   if (changeInfo.discarded === true) {
     syncNetworkBlock(tab, null);
   } else if (changeInfo.discarded === false) {
@@ -1167,17 +1271,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "GET_SLEEP_INFO":
         await ensureSleepDataCache();
+        await ensureIncognitoCache();
         if (!sender?.tab || !isSleepPage(sender.tab)) return { ok: true, info: null };
         {
           const info = sleepPageData(sender.tab);
           let domain = "Original page";
           try { domain = new URL(info?.url || "").hostname || domain; } catch (_) {}
-          return { ok: true, info: info ? { title: info.title, domain } : null };
+          return {
+            ok: true,
+            info: info ? {
+              title: info.title,
+              domain,
+              url: info.url,
+              restored: !!info.restoredAt
+            } : null
+          };
         }
 
       case "RESTORE_CURRENT_SLEEP_TAB":
         if (!Number.isInteger(sender?.tab?.id)) throw new Error("Could not identify this sleeping tab.");
-        await wakeTab(sender.tab.id);
+        await restoreSleepTab(sender.tab.id);
         return { ok: true };
 
       case "CLOSE_TAB":
